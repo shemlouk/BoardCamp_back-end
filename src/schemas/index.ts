@@ -17,3 +17,11 @@ export const customerSchema = Joi.object({
 })
   .options({ presence: "required" })
   .required();
+
+export const rentalSchema = Joi.object({
+  customerId: Joi.number().integer().min(0),
+  gameId: Joi.number().integer().min(0),
+  daysRented: Joi.number().integer().min(0),
+})
+  .options({ presence: "required" })
+  .required();
