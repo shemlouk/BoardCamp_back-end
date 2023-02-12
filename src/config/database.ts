@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-import { Pool } from "pg";
+import pg from "pg";
 
 dotenv.config();
 
@@ -8,4 +8,4 @@ const configDatabase = {
   ssl: process.env.MODE === "prod",
 };
 
-export default new Pool(configDatabase);
+export default new pg.Pool(configDatabase);
