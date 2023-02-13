@@ -81,7 +81,7 @@ export const
       const delayDays = Math.max(dayjs().diff(dayToReturn, "day"), 0);
       await db.query(
         'UPDATE rentals SET "returnDate" = $1, "delayFee" = $2 WHERE id = $3',
-        [new Date(), delayDays * rental.originalPrice, id]
+        [new Date(), (delayDays * rental.originalPrice) / rental.daysRented, id]
       );
       res.sendStatus(200);
     } catch ({ message }) {
