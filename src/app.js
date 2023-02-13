@@ -14,7 +14,7 @@ var gameSchema = Joi.object({
 var customerSchema = Joi.object({
   name: Joi.string(),
   phone: Joi.string().pattern(/\d{10,11}/),
-  cpf: Joi.string().pattern(/\d{11}/),
+  cpf: Joi.string().pattern(/^\d{11}$/),
   birthday: Joi.date().iso()
 }).options({ presence: "required" }).required();
 var rentalSchema = Joi.object({
