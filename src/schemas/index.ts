@@ -12,7 +12,7 @@ export const
   customerSchema = Joi.object({
     name: Joi.string(),
     phone: Joi.string().pattern(/\d{10,11}/),
-    cpf: Joi.string().pattern(/\d{11}/),
+    cpf: Joi.string().pattern(/^\d{11}$/),
     birthday: Joi.date().iso(),
   })
     .options({ presence: "required" })
