@@ -77,11 +77,25 @@ import dayjs from "dayjs";
 var read2 = async (req, res) => {
   try {
     const { rows } = await database_default.query("SELECT * FROM rentals");
-    rows.forEach((r) => {
-      r.rentDate = dayjs(r.rentDate).format("YYYY-MM-DD");
-      r.returnDate = r.returnDate && dayjs(r.returnDate).format("YYYY-MM-DD");
-    });
-    res.send(rows);
+    const result = await Promise.all(
+      rows.map(async (r) => {
+        const game = await database_default.query(
+          "SELECT id, name FROM games WHERE id = $1",
+          [r.gameId]
+        );
+        const customer = await database_default.query(
+          "SELECT id, name FROM customers WHERE id = $1",
+          [r.customerId]
+        );
+        r.customer = customer.rows[0];
+        r.game = game.rows[0];
+        r.rentDate = dayjs(r.rentDate).format("YYYY-MM-DD");
+        r.returnDate = r.returnDate && dayjs(r.returnDate).format("YYYY-MM-DD");
+        return r;
+      })
+    );
+    console.log(result);
+    res.send(result);
   } catch ({ message }) {
     res.status(500).send(message);
   }
