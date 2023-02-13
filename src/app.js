@@ -149,7 +149,7 @@ var returnOne = async (req, res) => {
     const delayDays = Math.max(dayjs().diff(dayToReturn, "day"), 0);
     await database_default.query(
       'UPDATE rentals SET "returnDate" = $1, "delayFee" = $2 WHERE id = $3',
-      [/* @__PURE__ */ new Date(), delayDays * rental.originalPrice, id]
+      [/* @__PURE__ */ new Date(), delayDays * rental.originalPrice / rental.daysRented, id]
     );
     res.sendStatus(200);
   } catch ({ message }) {
