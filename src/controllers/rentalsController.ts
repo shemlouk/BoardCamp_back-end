@@ -3,15 +3,29 @@ import { rentalSchema } from "../schemas";
 import db from "../config/database";
 import dayjs from "dayjs";
 
-export const
-  read = async (req: Request, res: Response) => {
+export const read = async (req: Request, res: Response) => {
     try {
       const { rows } = await db.query("SELECT * FROM rentals");
-      rows.forEach((r) => {
-        r.rentDate = dayjs(r.rentDate).format("YYYY-MM-DD");
-        r.returnDate = r.returnDate && dayjs(r.returnDate).format("YYYY-MM-DD");
-      });
-      res.send(rows);
+      const result = await Promise.all(
+        rows.map(async (r) => {
+          const game = await db.query(
+            "SELECT id, name FROM games WHERE id = $1",
+            [r.gameId]
+          );
+          const customer = await db.query(
+            "SELECT id, name FROM customers WHERE id = $1",
+            [r.customerId]
+          );
+          r.customer = customer.rows[0];
+          r.game = game.rows[0];
+          r.rentDate = dayjs(r.rentDate).format("YYYY-MM-DD");
+          r.returnDate =
+            r.returnDate && dayjs(r.returnDate).format("YYYY-MM-DD");
+          return r;
+        })
+      );
+      console.log(result);
+      res.send(result);
     } catch ({ message }) {
       res.status(500).send(message);
     }
