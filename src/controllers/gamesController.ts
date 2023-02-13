@@ -21,7 +21,7 @@ export const
         [name]
       );
       if (rowCount) return res.sendStatus(409);
-      db.query(
+      await db.query(
         'INSERT INTO games (name, image, "stockTotal", "pricePerDay") VALUES ($1, $2, $3, $4)',
         [name, image, stockTotal, pricePerDay]
       );

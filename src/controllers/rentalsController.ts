@@ -3,7 +3,8 @@ import { rentalSchema } from "../schemas";
 import db from "../config/database";
 import dayjs from "dayjs";
 
-export const read = async (req: Request, res: Response) => {
+export const
+  read = async (req: Request, res: Response) => {
     try {
       const { rows } = await db.query("SELECT * FROM rentals");
       const result = await Promise.all(
@@ -24,7 +25,6 @@ export const read = async (req: Request, res: Response) => {
           return r;
         })
       );
-      console.log(result);
       res.send(result);
     } catch ({ message }) {
       res.status(500).send(message);
@@ -51,7 +51,7 @@ export const read = async (req: Request, res: Response) => {
         game.rows[0].stockTotal <= rowCount
       )
         return res.sendStatus(400);
-      db.query(
+      await db.query(
         'INSERT INTO rentals ("customerId", "gameId", "daysRented", "rentDate", "originalPrice", "returnDate", "delayFee") VALUES ($1, $2, $3, $4, $5, $6, $7)',
         [
           customerId,
@@ -79,7 +79,7 @@ export const read = async (req: Request, res: Response) => {
       if (rental.returnDate) return res.sendStatus(400);
       const dayToReturn = dayjs(rental.rentDate).add(rental.daysRented, "day");
       const delayDays = Math.max(dayjs().diff(dayToReturn, "day"), 0);
-      db.query(
+      await db.query(
         'UPDATE rentals SET "returnDate" = $1, "delayFee" = $2 WHERE id = $3',
         [new Date(), delayDays * rental.originalPrice, id]
       );
@@ -96,7 +96,7 @@ export const read = async (req: Request, res: Response) => {
       ]);
       if (!rows[0]) return res.sendStatus(404);
       if (!rows[0].returnDate) return res.sendStatus(400);
-      db.query("DELETE FROM rentals WHERE id = $1", [id]);
+      await db.query("DELETE FROM rentals WHERE id = $1", [id]);
       res.sendStatus(200);
     } catch ({ message }) {
       res.status(500).send(message);

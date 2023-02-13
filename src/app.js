@@ -54,7 +54,7 @@ var create = async (req, res) => {
     );
     if (rowCount)
       return res.sendStatus(409);
-    database_default.query(
+    await database_default.query(
       'INSERT INTO games (name, image, "stockTotal", "pricePerDay") VALUES ($1, $2, $3, $4)',
       [name, image, stockTotal, pricePerDay]
     );
@@ -94,7 +94,6 @@ var read2 = async (req, res) => {
         return r;
       })
     );
-    console.log(result);
     res.send(result);
   } catch ({ message }) {
     res.status(500).send(message);
@@ -118,7 +117,7 @@ var create2 = async (req, res) => {
     );
     if (!customer.rowCount || !game.rowCount || game.rows[0].stockTotal <= rowCount)
       return res.sendStatus(400);
-    database_default.query(
+    await database_default.query(
       'INSERT INTO rentals ("customerId", "gameId", "daysRented", "rentDate", "originalPrice", "returnDate", "delayFee") VALUES ($1, $2, $3, $4, $5, $6, $7)',
       [
         customerId,
@@ -148,7 +147,7 @@ var returnOne = async (req, res) => {
       return res.sendStatus(400);
     const dayToReturn = dayjs(rental.rentDate).add(rental.daysRented, "day");
     const delayDays = Math.max(dayjs().diff(dayToReturn, "day"), 0);
-    database_default.query(
+    await database_default.query(
       'UPDATE rentals SET "returnDate" = $1, "delayFee" = $2 WHERE id = $3',
       [/* @__PURE__ */ new Date(), delayDays * rental.originalPrice, id]
     );
@@ -167,7 +166,7 @@ var deleteOne = async (req, res) => {
       return res.sendStatus(404);
     if (!rows[0].returnDate)
       return res.sendStatus(400);
-    database_default.query("DELETE FROM rentals WHERE id = $1", [id]);
+    await database_default.query("DELETE FROM rentals WHERE id = $1", [id]);
     res.sendStatus(200);
   } catch ({ message }) {
     res.status(500).send(message);
@@ -224,7 +223,7 @@ var create3 = async (req, res) => {
     );
     if (rowCount)
       return res.sendStatus(409);
-    database_default.query(
+    await database_default.query(
       "INSERT INTO customers (name, phone, cpf, birthday) VALUES ($1, $2, $3, $4)",
       [name, phone, cpf, birthday]
     );
@@ -246,7 +245,7 @@ var update = async (req, res) => {
     );
     if (rowCount)
       return res.sendStatus(409);
-    database_default.query(
+    await database_default.query(
       "UPDATE customers SET name = $1, phone = $2, cpf = $3, birthday = $4 WHERE id = $5",
       [name, phone, cpf, birthday, id]
     );
